@@ -108,9 +108,24 @@ public class UserController {
         return null;
     }
 
+    /**
+     * Firebase Login
+     * /api/user/firebaselogin
+     */
+    @PostMapping("/firebaselogin")
+    public User firebaseLogin(@RequestParam(value = "email") @Email @NotNull @Length(max = 128) String email,
+                                @RequestParam(value = "screenName") @NotNull @Length(max = 50) String screenName,
+                                @RequestParam(value = "nickname", required = false) @Length(max = 50) String nickname) {
 
+        User user = new User();
+        user.setEmail(email);
+        user.setScreenName(screenName);
+        user.setNickname(nickname);
 
+        userService.firebaseLogin(user);
 
+        return user;
+    }
 
 
 

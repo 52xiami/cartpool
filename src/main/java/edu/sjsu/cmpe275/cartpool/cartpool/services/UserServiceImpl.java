@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
                 String token = UUID.randomUUID().toString().replace("-", "");
                 user.setToken(token);
+                user.setContribution(0);
                 userRepository.save(user);
                 sendVerificationEmail(user.getEmail(), token);
                 return user;
@@ -106,6 +108,27 @@ public class UserServiceImpl implements UserService {
 
         }else{
             throw new NotFoundException("Cannot find User.");
+        }
+    }
+
+    @Override
+    public User firebaseLogin(User user) {
+
+        if(userRepository.existsByEmail(user.getEmail())){
+            return userRepository.findByEmail(user.getEmail());
+        }else{
+            user.setPassword(bCryptPasswordEncoder.encode(user.getEmail()));
+            user.setActive(true);
+            user.setContribution(0);
+            int atIndex = user.getEmail().indexOf("@");
+            String domain = user.getEmail().substring(atIndex+1);
+            if(domain.equals("sjsu.edu")){
+                user.setRole(Role.ADMIN);
+            }else {
+                user.setRole(Role.USER);
+            }
+            user.setCreationTime(LocalDateTime.now());
+            return userRepository.save(user);
         }
     }
 

@@ -12,4 +12,5 @@ public interface UserService {
     User verifyUser(String token);
     User joinCartPool(Long id, Long cartPoolId);
     User setContributionScore(Long id, Integer score);
+    User firebaseLogin(User user);
 }
