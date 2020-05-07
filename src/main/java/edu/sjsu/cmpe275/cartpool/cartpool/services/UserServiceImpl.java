@@ -9,12 +9,14 @@ import edu.sjsu.cmpe275.cartpool.cartpool.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@EnableAsync
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,7 +29,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers() {
-        mailService.sendHtmlMail("zhaoxna@gmail.com", "Test", "Hello!");
         return userRepository.findAll();
     }
 
@@ -110,7 +111,8 @@ public class UserServiceImpl implements UserService {
 
     public void sendVerificationEmail(String to, String token){
         String subject = "Registration Confirmation";
-        String content = "token is: " + token;
+        String content = "<p>Thanks for registering to CartPool!</p>" +
+                "<p>Please verify your email at: <a href='http://localhost:3000/verification/" + token + "'>Link</a></p>";
         mailService.sendHtmlMail(to, subject, content);
     }
 

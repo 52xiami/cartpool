@@ -37,17 +37,17 @@ public class StoreController {
      * /api/store/
      */
     @PostMapping("")
-    public Store createStore() {
-        return null;
+    public Store createStore(@RequestBody Store store) {
+        return storeService.createStore(store);
     }
 
     /**
      * Update a store
      * /api/store/
      */
-    @PutMapping("{id}")
-    public Store updateStore(@PathVariable("id") Long id) {
-        return null;
+    @PutMapping("")
+    public Store updateStore(@RequestBody Store store) {
+        return storeService.updateStore(store);
     }
 
     /**

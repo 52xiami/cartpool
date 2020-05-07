@@ -2,16 +2,12 @@ package edu.sjsu.cmpe275.cartpool.cartpool.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.sjsu.cmpe275.cartpool.cartpool.exceptions.ResponseBody;
-import edu.sjsu.cmpe275.cartpool.cartpool.models.User;
-import edu.sjsu.cmpe275.cartpool.cartpool.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

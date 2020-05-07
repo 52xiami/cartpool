@@ -29,7 +29,7 @@ public class Store {
     @Column(name="zip")
     private String zip;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinTable(name = "inventory",
             joinColumns = @JoinColumn(name = "store_id",referencedColumnName="id"),
             inverseJoinColumns = @JoinColumn(name = "product_id",referencedColumnName="id"))

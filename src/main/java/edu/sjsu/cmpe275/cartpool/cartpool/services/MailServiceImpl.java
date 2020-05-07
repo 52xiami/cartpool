@@ -1,15 +1,13 @@
 package edu.sjsu.cmpe275.cartpool.cartpool.services;
 
-import com.sun.javaws.IconUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.sql.SQLOutput;
 
 @RequiredArgsConstructor
 @Service
@@ -17,6 +15,7 @@ public class MailServiceImpl implements MailService{
 
     private final JavaMailSender mailSender;
 
+    @Async
     @Override
     public void sendHtmlMail(String to, String subject, String content){
 
@@ -33,7 +32,7 @@ public class MailServiceImpl implements MailService{
 
             messageHelper.setText(content, true);
 
-            //mailSender.send(message);
+            mailSender.send(message);
 
             System.out.println(content);
 

@@ -9,4 +9,6 @@ public interface StoreService {
     List<Store> getStores();
     Store getStore(Long id);
     List<Product> getProducts(Long id);
+    Store createStore(Store store);
+    Store updateStore(Store store);
 }

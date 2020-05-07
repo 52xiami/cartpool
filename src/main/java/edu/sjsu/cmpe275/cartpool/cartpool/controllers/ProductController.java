@@ -5,11 +5,8 @@ import edu.sjsu.cmpe275.cartpool.cartpool.models.Product;
 import edu.sjsu.cmpe275.cartpool.cartpool.services.ProductService;
 import edu.sjsu.cmpe275.cartpool.cartpool.services.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -72,17 +69,17 @@ public class ProductController {
      * /api/product/
      */
     @PostMapping("")
-    public Product createProduct() {
-        return null;
+    public Product createProduct(@RequestBody Product product ) {
+        return productService.createProduct(product);
     }
 
     /**
      * Update a product
      * /api/product/
      */
-    @PutMapping("{id}")
-    public Product updateProduct(@PathVariable("id") Long id) {
-        return null;
+    @PutMapping("")
+    public Product updateProduct(@RequestBody Product product) {
+        return productService.updateProduct(product);
     }
 
     /**

@@ -58,4 +58,29 @@ public class ProductServiceImpl implements ProductService {
         return inventory;
     }
 
+    @Override
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Product updateProduct(Product product) {
+        if(productRepository.findById(product.getProductId()).isPresent()) {
+            Product updateProduct = productRepository.findById(product.getProductId()).get();
+
+            updateProduct.setName(product.getName());
+            updateProduct.setDescription(product.getDescription());
+            updateProduct.setImageUrl(product.getImageUrl());
+            updateProduct.setBrand(product.getBrand());
+            updateProduct.setCategory(product.getCategory());
+            updateProduct.setPrice(product.getPrice());
+            updateProduct.setUnit(product.getUnit());
+
+            return productRepository.save(updateProduct);
+
+        } else {
+            throw new NotFoundException("Cannot find product");
+        }
+    }
+
 }
