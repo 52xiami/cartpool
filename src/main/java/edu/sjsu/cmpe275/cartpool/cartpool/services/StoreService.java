@@ -11,4 +11,5 @@ public interface StoreService {
     List<Product> getProducts(Long id);
     Store createStore(Store store);
     Store updateStore(Store store);
+    Store deleteStore(Long id);
 }

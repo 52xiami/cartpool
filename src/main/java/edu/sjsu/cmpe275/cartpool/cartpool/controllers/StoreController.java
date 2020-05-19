@@ -56,7 +56,7 @@ public class StoreController {
      */
     @DeleteMapping("{id}")
     public Store deleteStore(@PathVariable("id") Long id) {
-        return null;
+        return storeService.deleteStore(id);
     }
 
 }

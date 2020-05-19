@@ -4,10 +4,13 @@ import edu.sjsu.cmpe275.cartpool.cartpool.exceptions.NotFoundException;
 import edu.sjsu.cmpe275.cartpool.cartpool.models.*;
 import edu.sjsu.cmpe275.cartpool.cartpool.repositories.OrderDetailsRepository;
 import edu.sjsu.cmpe275.cartpool.cartpool.repositories.OrderRepository;
+import edu.sjsu.cmpe275.cartpool.cartpool.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +20,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailsRepository orderDetailsRepository;
     private final UserService userService;
+    private final MailService mailService;
+    private final UserRepository userRepository;
 
     @Override
     public List<Order> getOrders() {
@@ -50,7 +55,9 @@ public class OrderServiceImpl implements OrderService {
             d.setTaxFee(taxfee);
         }
 
-        order.setAmount(amount);
+
+        BigDecimal bdAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+        order.setAmount(bdAmount.doubleValue());
 
         order.setOrderDetails(null);
         order.setStatus(OrderStatus.CREATED);
@@ -62,6 +69,11 @@ public class OrderServiceImpl implements OrderService {
         }
         
         orderDetailsRepository.saveAll(orderDetails);
+
+        User user = userRepository.findById(order.getUserId()).get();
+        String subject = "Order Created";
+        String content = "<p>Your order("+ order.getId()+") has been created.</p>";
+        mailService.sendHtmlMail(user.getEmail(),subject, content);
 
         return newOrder;
     }
@@ -90,7 +102,19 @@ public class OrderServiceImpl implements OrderService {
         if(orderRepository.findById(orderId).isPresent()){
             Order order = orderRepository.findById(orderId).get();
             order.setPickupUser(userId);
-            return orderRepository.save(order);
+            orderRepository.save(order);
+
+            User user = userRepository.findById(order.getUserId()).get();
+            User pickupUser = userRepository.findById(userId).get();
+            String subject = "Order Pick Up";
+            String content = "<p>Your order("+ order.getId()+") will be picked up by "+pickupUser.getScreenName()+".</p>";
+            mailService.sendHtmlMail(user.getEmail(),subject, content);
+
+            String pickupSubject = "Order Pick Up";
+            String pickupContent = "<p>Your will pick up order("+ order.getId()+") for others.</p>";
+            mailService.sendHtmlMail(pickupUser.getEmail(),pickupSubject, pickupContent);
+
+            return order;
         }else {
             throw new NotFoundException("Cannot find order");
         }
@@ -119,11 +143,35 @@ public class OrderServiceImpl implements OrderService {
                 order.setStatus(OrderStatus.DELIVERED);
                 order.setPickupTime(LocalDateTime.now());
                 order.setDeliveredTime(LocalDateTime.now());
+
+                orderRepository.save(order);
+
+                User user = userRepository.findById(order.getUserId()).get();
+                String subject = "Order Delivered";
+                String content = "<p>Your order("+ order.getId()+") has been delivered.</p>";
+                mailService.sendHtmlMail(user.getEmail(),subject, content);
+
             }else{
                 order.setStatus(OrderStatus.PICKED);
                 order.setPickupTime(LocalDateTime.now());
+
+                orderRepository.save(order);
+
+                User user = userRepository.findById(order.getUserId()).get();
+                User pickupUser = userRepository.findById(order.getPickupUser()).get();
+                String subject = "Order Picked Up";
+                String content = "<p>Your order("+ order.getId()+") has been picked up by "+pickupUser.getScreenName()+".</p>";
+                mailService.sendHtmlMail(user.getEmail(),subject, content);
+
+                String pickupSubject = "Order Picked Up";
+                String pickupContent = "<p>Your have picked up order("+ order.getId()+") for others.</p>";
+                pickupContent += "<p>Order Details: "+ order.getOrderDetails().toString() +"</p>";
+                pickupContent += "<p>Shipping address is "+ order.getStreet()+", "+ order.getCity()+", "+order.getState()+
+                        ", "+ order.getZip()+"</p>";
+                mailService.sendHtmlMail(pickupUser.getEmail(),pickupSubject, pickupContent);
+
             }
-            return orderRepository.save(order);
+            return order;
         }else {
             throw new NotFoundException("Cannot find order");
         }
@@ -146,7 +194,14 @@ public class OrderServiceImpl implements OrderService {
 
             }
 
-            return orderRepository.save(order);
+            orderRepository.save(order);
+
+            User user = userRepository.findById(order.getUserId()).get();
+            String subject = "Order Delivered";
+            String content = "<p>Your order("+ order.getId()+") has been delivered.</p>";
+            mailService.sendHtmlMail(user.getEmail(),subject, content);
+
+            return order;
         }else {
             throw new NotFoundException("Cannot find order");
         }

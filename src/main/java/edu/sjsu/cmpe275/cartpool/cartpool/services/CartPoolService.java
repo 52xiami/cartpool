@@ -8,4 +8,5 @@ public interface CartPoolService {
     List<CartPool> getCartPools();
     CartPool getCartPool(Long id);
     CartPool createCartPool(CartPool cartPool);
+    CartPool deleteCartPool(Long id);
 }

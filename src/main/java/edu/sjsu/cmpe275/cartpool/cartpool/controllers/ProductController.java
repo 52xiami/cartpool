@@ -7,7 +7,9 @@ import edu.sjsu.cmpe275.cartpool.cartpool.services.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -41,9 +43,25 @@ public class ProductController {
      * /api/product/addToStore
      */
     @PostMapping("/addToStore")
-    public Inventory addProductToStore(@RequestParam(value = "productId") @NotNull Long productId, @RequestParam(value = "storeId") Long storeId) {
+    public Inventory addProductToStore(@RequestParam(value = "productId") @NotNull Long productId,
+                                       @RequestParam(value = "storeId") Long storeId) {
 
         return productService.addProductToStore(productId,storeId);
+    }
+
+    /**
+     * Add product to store
+     * /api/product/addToStores
+     */
+    @Transactional
+    @PostMapping("/addToStores/{id}")
+    public List<Inventory> addProductToStoreBatch(@PathVariable("id") Long productId,
+                                            @RequestBody List<Long> storeIds) {
+        List<Inventory> inventories = new ArrayList<>();
+        for(Long storeId : storeIds){
+            inventories.add(productService.addProductToStore(productId,storeId));
+        }
+        return inventories;
     }
 
     /**
@@ -88,7 +106,7 @@ public class ProductController {
      */
     @DeleteMapping("{id}")
     public Product deleteProduct(@PathVariable("id") Long id) {
-        return null;
+        return productService.deleteProduct(id);
     }
 
 

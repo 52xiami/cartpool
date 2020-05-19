@@ -72,7 +72,7 @@ public class CartPoolController {
      */
     @DeleteMapping("{id}")
     public CartPool deleteCartPool(@PathVariable("id") Long id) {
-        return null;
+        return cartPoolService.deleteCartPool(id);
     }
 
 

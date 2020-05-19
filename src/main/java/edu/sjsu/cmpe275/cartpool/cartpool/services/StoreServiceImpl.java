@@ -2,8 +2,11 @@ package edu.sjsu.cmpe275.cartpool.cartpool.services;
 
 import edu.sjsu.cmpe275.cartpool.cartpool.exceptions.ConflictException;
 import edu.sjsu.cmpe275.cartpool.cartpool.exceptions.NotFoundException;
+import edu.sjsu.cmpe275.cartpool.cartpool.models.Order;
+import edu.sjsu.cmpe275.cartpool.cartpool.models.OrderStatus;
 import edu.sjsu.cmpe275.cartpool.cartpool.models.Product;
 import edu.sjsu.cmpe275.cartpool.cartpool.models.Store;
+import edu.sjsu.cmpe275.cartpool.cartpool.repositories.OrderRepository;
 import edu.sjsu.cmpe275.cartpool.cartpool.repositories.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import java.util.List;
 @Service
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public List<Store> getStores() {
@@ -67,5 +71,21 @@ public class StoreServiceImpl implements StoreService {
             throw new NotFoundException("Cannot find store");
         }
 
+    }
+
+    @Override
+    public Store deleteStore(Long id) {
+        if(storeRepository.findById(id).isPresent()) {
+            Store store = storeRepository.findById(id).get();
+            List<Order> orders = orderRepository.findAllByStoreIdAndStatusNot(id, OrderStatus.DELIVERED);
+            if (orders.size()>0){
+                throw new ConflictException("Cannot delete store, since there are unfulfilled orders.");
+            }else{
+                storeRepository.deleteById(id);
+                return store;
+            }
+        }else{
+            throw new NotFoundException("Cannot find store.");
+        }
     }
 }

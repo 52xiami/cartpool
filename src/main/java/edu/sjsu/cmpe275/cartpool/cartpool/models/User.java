@@ -30,6 +30,9 @@ public class User {
     @Column(name="pool_id")
     private Long poolId;
 
+    @Column(name="pool_status")
+    private String poolStatus;
+
     @Column(name="contribution")
     private Integer contribution;
 
